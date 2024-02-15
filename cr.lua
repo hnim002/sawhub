@@ -2099,23 +2099,7 @@ task.spawn(function()
     end)
 end)
 
-if not getgenv().NetworkOwnerShipClaim then
-    getgenv().NetworkOwnerShipClaim = true
-    settings().Physics.AllowSleep = false
-    settings().Physics.PhysicsEnvironmentalThrottle = Enum.EnviromentalPhysicsThrottle.Disabled
-    spawn(function()
-        while wait() do
-            for i, v in pairs(game.Players:GetChildren()) do
-                if v ~= game.Players.LocalPlayer then
-                    sethiddenproperty(v, "MaximumSimulationRadius", 0.1)
-                    sethiddenproperty(v, "SimulationRadius", 0.1)
-                end
-            end
-            sethiddenproperty(LP, "MaxSimulationRadius", math.huge)
-            sethiddenproperty(LP, "SimulationRadius", math.huge)
-         end
-    end)
- end
+
 
 while task.wait() do
     CheckFarm()
