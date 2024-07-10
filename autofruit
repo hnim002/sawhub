@@ -1,0 +1,189 @@
+repeat
+	wait();
+until game:IsLoaded();
+repeat
+	wait();
+until game.Players.LocalPlayer;
+repeat
+	wait();
+	local args = {
+		[1] = "SetTeam",
+		[2] = "Marines"
+	};
+	(game:GetService("ReplicatedStorage")).Remotes.CommF_:InvokeServer(unpack(args));
+until game.Players.LocalPlayer.Team ~= nil and game:IsLoaded();
+
+function SendWebHook3(m)
+	local msg = {
+		embeds = {
+			{
+				title = "Saw Hub",
+				fields = {
+					{
+						name = "Fruit : ",
+						value = "```" .. m .. "```",
+						inline = false
+					}
+				},
+				type = "rich",
+				color = tonumber(47103),
+				footer = {
+					text = "Saw Hub (" .. os.date("%X") .. ")"
+				}
+			}
+		}
+	};
+	request({
+		Url = "https://discord.com/api/webhooks/1260049706571006063/2mhJX4UZP52KVGnTjyfMJROSHz7Y-KZgcWRON4fpz1PK3y-WijwiWlAZJuFFTEVEO3_A",
+		Method = "POST",
+		Headers = {
+			["Content-Type"] = "application/json"
+		},
+		Body = (game:GetService("HttpService")):JSONEncode(msg)
+	});
+end;
+function GetFruit()
+	local toable = {};
+	for i, v in pairs(workspace:GetChildren()) do
+		if v.Name == "Fruit " then
+			local sdas = {};
+			for i2, v2 in pairs(v:GetChildren()) do
+				table.insert(sdas, v2);
+			end;
+			table.insert(toable, "Fruit (" .. table.concat(sdas, ",") .. ")");
+		elseif string.find(v.Name, "Fruit") then
+			table.insert(toable, v);
+		end;
+	end;
+	return toable;
+end;
+
+function toTarget(targetCFrame)
+	local Distance = (targetCFrame.Position - game:GetService("Players").LocalPlayer.Character:WaitForChild("HumanoidRootPart").Position).Magnitude
+	local Speed = 100
+	if Distance < 1000 then
+		Speed = 350
+	elseif Distance >= 1000 then
+		Speed = 250
+	end
+	local tweenfunc = {}
+
+	local tween_s = game:service"TweenService"
+	local info = TweenInfo.new((targetCFrame.Position - game:GetService("Players").LocalPlayer.Character:WaitForChild("HumanoidRootPart").Position).Magnitude/Speed, Enum.EasingStyle.Linear)
+	local tween = tween_s:Create(game:GetService("Players").LocalPlayer.Character["HumanoidRootPart"], info, {CFrame = targetCFrame})
+	tween:Play()
+
+	function tweenfunc:Stop()
+		tween:Cancel()
+	end 
+
+	if not tween then return tween end
+	return tweenfunc
+end
+
+
+function RemoveSpaces(str)
+    return str:gsub(" Fruit", "")
+end
+
+function StoreFruit(v)
+    if string.find(v.Name,"Fruit") then
+		local FruitName = RemoveSpaces(v.Name)
+		if v.Name == "Bird: Falcon Fruit" then
+			NameFruit = "Bird-Bird: Falcon"
+		elseif v.Name == "Bird: Phoenix Fruit" then
+			NameFruit = "Bird-Bird: Phoenix"
+		elseif v.Name == "Human: Buddha Fruit" then
+			NameFruit = "Human-Human: Buddha"
+		else
+			NameFruit = FruitName.."-"..FruitName
+		end
+        local Target = game:GetService("ReplicatedStorage").Remotes["CommF_"];
+        Target:InvokeServer("StoreFruit", NameFruit,v);
+	end
+end
+
+task.spawn(function()
+	while wait() do
+		for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+			StoreFruit(v)
+		end
+		for i,v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+			StoreFruit(v)
+		end
+	end
+end)
+
+local texttt = "";
+for i, v in pairs(GetFruit()) do
+	texttt = texttt .. v.Name;
+	repeat wait()
+		toTarget(v.Handle.CFrame)
+	until not v.Parent or (game.Players.LocalPlayer.Character.HumanoidRootPart.Position-v.Handle.Position).Magnitude < 5
+end;
+SendWebHook3(texttt);
+
+function HopServer()
+	local function Hop()
+		for i = 1, 100 do
+			local huhu = (game:GetService("ReplicatedStorage")).__ServerBrowser:InvokeServer(i);
+			for k, v in pairs(huhu) do
+				if k ~= game.JobId and v.Count < 9 then
+
+						(game:GetService("ReplicatedStorage")).__ServerBrowser:InvokeServer("teleport", k);
+						return true;
+					
+				end;
+			end;
+		end;
+		return false;
+	end;
+	if not (getgenv()).Loaded then
+		local function child(v)
+			if v.Name == "ErrorPrompt" then
+				if v.Visible then
+					if v.TitleFrame.ErrorTitle.Text == "Teleport Failed" then
+						HopServer();
+					end;
+				end;
+				(v:GetPropertyChangedSignal("Visible")):Connect(function()
+					if v.Visible then
+						if v.TitleFrame.ErrorTitle.Text == "Teleport Failed" then
+							HopServer();
+						end;
+					end;
+				end);
+			end;
+		end;
+		for k, v in pairs(game.CoreGui.RobloxPromptGui.promptOverlay:GetChildren()) do
+			child(v);
+		end;
+		game.CoreGui.RobloxPromptGui.promptOverlay.ChildAdded:Connect(child);
+		(getgenv()).Loaded = true;
+	end;
+	while not Hop() do
+		wait();
+	end;
+	SaveSettings();
+end;
+
+HopServer()
+local Bypass = {
+	Mansion = Vector3.new(-12550.169921875, 340.94024658203, -7500.677734375),
+	Castle = Vector3.new(-5058.05, 314.551, -3156.41),
+	Hydra = Vector3.new(5758.77, 610.459, -235.079),
+	Mansion2 = Vector3.new(-11992.5977, 331.842743, -8881.40527),
+	Hydra2 = Vector3.new(5314.58203, 25.5193882, -125.942276)
+};
+function CheckTP(targetpos)
+	local cf;
+	local memaybeo = (game:GetService("Players")).LocalPlayer:DistanceFromCharacter(targetpos);
+	for i, v in pairs(Bypass) do
+		local memaykobeo = (v - targetpos).Magnitude;
+		if memaybeo > memaykobeo then
+			memaybeo = memaykobeo;
+			cf = v;
+		end;
+	end;
+	return cf;
+end;
